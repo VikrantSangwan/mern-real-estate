@@ -8,6 +8,7 @@ export default function SignUp() {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
+    // nice way of handling multiple inputs
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
@@ -22,10 +23,15 @@ export default function SignUp() {
         },
         body: JSON.stringify(formData),
       });
-      await res.json();
+      const data = await res.json();
+      if(data.success === false){
+        setloading(false);
+        setError(data.message);
+        return;
+      }
       setloading(false);
       setError(null);
-      navigate('/signin')
+      navigate('/sign-in')
     } catch (err) {
       setloading(false);
       setError(err.message);
