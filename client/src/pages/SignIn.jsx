@@ -1,20 +1,27 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+} from '../redux/user/userSlice'
 
 export default function SignIn() {
   const [formData, setFormData] = useState({});
-  const [loading, setloading] = useState(null);
-  const [error, setError] = useState(null);
+  const { loading, error } = useSelector((state) => state.user);
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value,
+    });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setloading(true);
     try {
+      dispatch(signInStart());
       const res = await fetch("/api/auth/signin", {
         method: "POST",
         headers: {
@@ -23,22 +30,17 @@ export default function SignIn() {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
-      // when user is invalid or credentials are wrong
-      if(data.success === false){
-        setloading(false);
-        setError(data.message);
+      console.log(data);
+      if (data.success === false) {
+        dispatch(signInFailure(data.message));
         return;
       }
-       setloading(false);
-       setError(null);
-       navigate("/");
-    } catch (err) {
-      // when we cannot connect to server or any other reason
-      setloading(false);
-      setError(err.message);
+      dispatch(signInSuccess(data));
+      navigate("/");
+    } catch (error) {
+      dispatch(signInFailure(error.message));
     }
   };
-
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl text-center font-semibold my-7">Sign In</h1>
@@ -57,9 +59,10 @@ export default function SignIn() {
           id="password"
           onChange={handleChange}
         />
+
         <button
           disabled={loading}
-          className="bg-slate-700 rounded-lg text-white p-3 uppercase hover:opacity-95 disabled:opacity-80"
+          className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
         >
           {loading ? "Loading..." : "Sign In"}
         </button>
@@ -67,7 +70,7 @@ export default function SignIn() {
       <div className="flex gap-2 mt-5">
         <p>Dont have an account?</p>
         <Link to={"/sign-up"}>
-          <span className="text-blue-700">Sign Up</span>
+          <span className="text-blue-700">Sign up</span>
         </Link>
       </div>
       {error && <p className="text-red-500 mt-5">{error}</p>}
