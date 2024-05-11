@@ -30,8 +30,9 @@ export default function Profile() {
     const fileName = new Date().getTime() + file.name;
     // Create a reference to the location where the file will be stored in Firebase Storage.
     const storageRef = ref(storage, fileName);
-    // Set up a listener for state changes in the upload task to track the upload progress
+    // Initiate an upload task to upload the file to Firebase Storage
     const uploadTask = uploadBytesResumable(storageRef, file);
+    // Set up a listener for state changes in the upload task to track the upload progress
     uploadTask.on(
       "state_changed",
       (snapshot) => {
@@ -73,6 +74,7 @@ export default function Profile() {
           className="rounded-full h-24 w-24 object-cover cursor-pointer self-center"
           onClick={() => fileRef.current.click()}
         />
+        {/* Image uploading percentage */}
         <p className="text-sm self-center">
           {fileUploadError ? (
             <span className="text-red-700">Error while uploading file (image size should be less than 2 MB)</span>
