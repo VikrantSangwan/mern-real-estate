@@ -13,7 +13,10 @@ import {
   updateUserSuccess,
   deleteUserFailure,
   deleteUserStart,
-  deleteUserSuccess
+  deleteUserSuccess,
+  signOutFailure,
+  signOutSuccess,
+  signOutStart,
 } from "../redux/user/userSlice";
 import { app } from "../firebase.js";
 
@@ -89,27 +92,26 @@ export default function Profile() {
     }
   };
 
-  const handleDeleteUser = async(e) =>{
+  const handleDeleteUser = async (e) => {
     try {
       dispatch(deleteUserStart());
       const res = await fetch(`api/user/delete/${currentUser._id}`, {
-        method :'DELETE',
+        method: "DELETE",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
       });
 
       const data = await res.json();
-      if(data.success === false){
+      if (data.success === false) {
         dispatch(deleteUserFailure(data.message));
         return;
       }
-      dispatch(deleteUserSuccess(data))
+      dispatch(deleteUserSuccess(data));
     } catch (error) {
       dispatch(deleteUserFailure(error.message));
     }
-  }
-
+  };
 
   console.log("currentUser", currentUser);
   // file base configuration for adding images file
@@ -117,6 +119,23 @@ export default function Profile() {
   // allow write: if
   // request.resource.size < 2 * 1025 * 1024 &&
   // request.resource.contentType.matches('image/.*')
+
+  const handleSignOutUser = async () => {
+    try {
+      dispatch(signOutStart())
+      const res = fetch("/api/auth/signout");
+      const data = (await res).json();
+
+      if (data.success == false) {
+        dispatch(signOutFailure(data.message))
+        return;
+      }
+      dispatch(signOutSuccess(data));
+    } catch (error) {
+      dispatch(signOutFailure(data.message));
+    }
+  };
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
@@ -131,7 +150,7 @@ export default function Profile() {
         />
         <img
           id="avatar"
-          src={formData?.avatar || currentUser?.avatar }
+          src={formData?.avatar || currentUser?.avatar}
           alt="profile"
           className="rounded-full h-24 w-24 object-cover cursor-pointer self-center"
           onClick={() => fileRef.current.click()}
@@ -181,10 +200,22 @@ export default function Profile() {
         </button>
       </form>
       <div className="flex justify-between mt-5">
-        <span className="text-red-700 cursor-pointer" onClick={handleDeleteUser}>Delete account</span>
-        <span className="text-red-700 cursor-pointer">Sign out</span>
+        <span
+          className="text-red-700 cursor-pointer"
+          onClick={handleDeleteUser}
+        >
+          Delete account
+        </span>
+        <span
+          className="text-red-700 cursor-pointer"
+          onClick={handleSignOutUser}
+        >
+          Sign out
+        </span>
       </div>
-      <p className="text-green-700 mt-5">{updateSuccess ? 'User updated successfully !!': ''}</p>
+      <p className="text-green-700 mt-5">
+        {updateSuccess ? "User updated successfully !!" : ""}
+      </p>
     </div>
   );
 }
