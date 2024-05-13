@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import userRouter from './routes/user.route.js'
 import authRouter from './routes/auth.route.js'
+import listingRouter from './routes/listing.route.js'
 import cookieParser from "cookie-parser";
 
 // enable environment variable access in vite
@@ -23,7 +24,8 @@ app.use(cookieParser());
 
 // Making different routes
 app.use("/api/user", userRouter);
-app.use("/api/auth", authRouter)
+app.use("/api/auth", authRouter);
+app.use("/api/listing", listingRouter);
 
 // middleware for handling next function
 app.use((err, req, res, next) =>{
