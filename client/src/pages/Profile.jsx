@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import { useRef } from "react";
 import {
   getStorage,
@@ -22,7 +23,7 @@ import { app } from "../firebase.js";
 
 export default function Profile() {
   const fileRef = useRef(null);
-  const { currentUser, loading, error } = useSelector((state) => state.user);
+  const { currentUser, loading } = useSelector((state) => state.user);
   const [file, setfile] = useState(null);
   const [fileUploadPerc, setfileUploadPerc] = useState(0);
   const [fileUploadError, setfileUploadError] = useState(false);
@@ -113,7 +114,6 @@ export default function Profile() {
     }
   };
 
-  console.log("currentUser", currentUser);
   // file base configuration for adding images file
   // allow read;
   // allow write: if
@@ -122,12 +122,12 @@ export default function Profile() {
 
   const handleSignOutUser = async () => {
     try {
-      dispatch(signOutStart())
+      dispatch(signOutStart());
       const res = fetch("/api/auth/signout");
       const data = (await res).json();
 
       if (data.success == false) {
-        dispatch(signOutFailure(data.message))
+        dispatch(signOutFailure(data.message));
         return;
       }
       dispatch(signOutSuccess(data));
@@ -198,6 +198,12 @@ export default function Profile() {
         >
           {loading ? "Loading..." : "Update"}
         </button>
+        <Link
+          to="/create-listing"
+          className="bg-green-700 text-center text-white rounded-lg p-3 uppercase hover:opacity-95"
+        >
+          Create Listing
+        </Link>
       </form>
       <div className="flex justify-between mt-5">
         <span
